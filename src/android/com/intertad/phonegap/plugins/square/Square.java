@@ -8,10 +8,10 @@ import android.content.pm.ResolveInfo;
 import android.util.Log;
 import android.net.Uri;
 
-import com.squareup.sdk.register.ChargeRequest;
-import com.squareup.sdk.register.CurrencyCode;
-import com.squareup.sdk.register.RegisterClient;
-import com.squareup.sdk.register.RegisterSdk;
+import com.squareup.sdk.pos.ChargeRequest;
+import com.squareup.sdk.pos.CurrencyCode;
+import com.squareup.sdk.pos.PosClient;
+import com.squareup.sdk.pos.PosSdk;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -67,7 +67,7 @@ public class Square extends CordovaPlugin {
     private String metadata;
 
     private static final Random RANDOM = new Random();
-    private RegisterClient registerClient;
+    private PosClient posClient;
     private CallbackContext requestCallback;
     private int requestCode = Math.abs(RANDOM.nextInt());
 
@@ -108,7 +108,7 @@ public class Square extends CordovaPlugin {
         Log.w(LOGTAG, "onActivityResult");
         if (this.requestCode == requestCode) {
 
-            // Handle the rare situation where the Square Register app was uninstalled during the request.
+            // Handle the rare situation where the Square Pos app was uninstalled during the request.
             if (data == null) {
                 return;
             }
@@ -120,7 +120,7 @@ public class Square extends CordovaPlugin {
             try {
                 JSONObject parameter = new JSONObject();
                 if (resultCode == Activity.RESULT_OK) {
-                    ChargeRequest.Success success = registerClient.parseChargeSuccess(data);
+                    ChargeRequest.Success success = posClient.parseChargeSuccess(data);
 
                     // Retrieve the transaction's client-generated and server-generated IDs.
                     // Descriptions of these fields are available in the SDK's javadoc.
@@ -134,7 +134,7 @@ public class Square extends CordovaPlugin {
                     // Persist and use the transaction IDs however you choose
                     requestCallback.success(parameter);
                 } else {
-                    ChargeRequest.Error error = registerClient.parseChargeError(data);
+                    ChargeRequest.Error error = posClient.parseChargeError(data);
 
                     // Get the type of error that occurred
                     parameter.putOpt("errorCode", error.code.toString());
@@ -199,9 +199,9 @@ public class Square extends CordovaPlugin {
 
         // Replace "applicationId" with your Square-assigned application ID,
         // available from the application dashboard.
-        registerClient = RegisterSdk.createClient(cordova.getActivity(), applicationId);
+        posClient = PosSdk.createClient(cordova.getActivity(), applicationId);
 
-        // You specify all of the details of a Register API transaction in a ChargeRequest
+        // You specify all of the details of a Pos API transaction in a ChargeRequest
         // object.
         ChargeRequest.Builder request = new ChargeRequest.Builder(amount, CurrencyCode.valueOf(currency))
                 .autoReturn(timeout, TimeUnit.MILLISECONDS);
@@ -228,15 +228,15 @@ public class Square extends CordovaPlugin {
 
         try {
             // This method generates an intent that includes the details of the transaction to process.
-            Intent chargeIntent = registerClient.createChargeIntent(request.build());
+            Intent chargeIntent = posClient.createChargeIntent(request.build());
 
             // This fires off the request to begin the app switch.
             cordova.startActivityForResult(this, chargeIntent, requestCode);
         } catch (ActivityNotFoundException e) {
 
-            // This opens Square Register's Google Play Store listing if Square Register
+            // This opens Square POS's Google Play Store listing if Square POS
             // doesn't appear to be installed on the device.
-            registerClient.openRegisterPlayStoreListing();
+            posClient.openPointOfSalePlayStoreListing();
         }
 
         return null;

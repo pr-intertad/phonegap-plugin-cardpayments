@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.squareup.sdk.register;
+package com.squareup.sdk.pos;
 
 /**
- * This class replicates constants used by Square Register for parsing Register API
+ * This class replicates constants used by Square Point of Sale for parsing Point of Sale API
  * transaction requests. These constants are used directly by the SDK. You do not
  * need to use them in your code.
  */
-public final class RegisterApi {
+public final class PosApi {
 
-  private static final String NAMESPACE = "com.squareup.register.";
+  private static final String NAMESPACE = "com.squareup.pos.";
 
   public static final String INTENT_ACTION_CHARGE = NAMESPACE + "action.CHARGE";
 
   /**
    * API version number String extra. Uses semantic versioning.
-   * Should currently be set to "1.0".
    */
   public static final String EXTRA_API_VERSION = NAMESPACE + "API_VERSION";
 
@@ -37,7 +36,7 @@ public final class RegisterApi {
 
   public static final String EXTRA_SDK_VERSION = NAMESPACE + "SDK_VERSION";
 
-  public static final String EXTRA_REGISTER_CLIENT_ID = NAMESPACE + "CLIENT_ID";
+  public static final String EXTRA_POINT_OF_SALE_CLIENT_ID = NAMESPACE + "CLIENT_ID";
 
   public static final String EXTRA_CURRENCY_CODE = NAMESPACE + "CURRENCY_CODE";
 
@@ -55,7 +54,11 @@ public final class RegisterApi {
 
   public static final String EXTRA_TENDER_OTHER = NAMESPACE + "TENDER_OTHER";
 
+  public static final String EXTRA_TENDER_CARD_ON_FILE = NAMESPACE + "TENDER_CARD_ON_FILE";
+
   public static final String EXTRA_AUTO_RETURN_TIMEOUT_MS = NAMESPACE + "AUTO_RETURN_TIMEOUT_MS";
+
+  public static final String EXTRA_CUSTOMER_ID = NAMESPACE + "CUSTOMER_ID";
 
   public static final long AUTO_RETURN_NO_TIMEOUT = 0L;
 
@@ -74,6 +77,9 @@ public final class RegisterApi {
   public static final String RESULT_ERROR_CODE = NAMESPACE + "ERROR_CODE";
 
   public static final String RESULT_ERROR_DESCRIPTION = NAMESPACE + "ERROR_DESCRIPTION";
+
+  public static final String ERROR_NO_EMPLOYEE_LOGGED_IN =
+      NAMESPACE + "ERROR_NO_EMPLOYEE_LOGGED_IN";
 
   public static final String ERROR_GIFT_CARDS_NOT_SUPPORTED =
       NAMESPACE + "ERROR_GIFT_CARDS_NOT_SUPPORTED";
@@ -107,7 +113,12 @@ public final class RegisterApi {
 
   public static final String ERROR_USER_NOT_ACTIVATED = NAMESPACE + "ERROR_USER_NOT_ACTIVATED";
 
-  private RegisterApi() {
+  public static final String ERROR_CUSTOMER_MANAGEMENT_NOT_SUPPORTED =
+      NAMESPACE + "ERROR_CUSTOMER_MANAGEMENT_NOT_SUPPORTED";
+
+  public static final String ERROR_INVALID_CUSTOMER_ID = NAMESPACE + "ERROR_INVALID_CUSTOMER_ID";
+
+  private PosApi() {
     throw new AssertionError();
   }
 }
