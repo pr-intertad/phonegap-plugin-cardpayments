@@ -68,6 +68,7 @@
         </js-module>
 
         <framework src="com.squareup.sdk:register-sdk:1.0" />
+        <framework src="com.squareup.sdk:point-of-sale-sdk:2.0" />
 
         <config-file target="res/xml/config.xml" parent="/*">
           <feature name="PayPalHere">
