@@ -39,16 +39,16 @@
               </dict>
           </array>
         </config-file>
-        
+
         <config-file target="*-Info.plist" parent="LSApplicationQueriesSchemes">
                                 <array>
                         <string>paypalhere</string>
                         <string>square-commerce-v1</string>
                     </array>
-                
-           
+
+
         </config-file>
-        
+
         <header-file src="src/ios/JSONKit.h" />
         <source-file src="src/ios/JSONKit.m" compiler-flags="-fno-objc-arc" />
         <header-file src="src/ios/NSDictionary+SCAdditions.h" />
@@ -82,6 +82,9 @@
         <source-file src="src/android/com/intertad/phonegap/plugins/paypalhere/PayPalHere.java" target-dir="src/com/intertad/phonegap/plugins/paypalhere"/>
         <source-file src="src/android/com/intertad/phonegap/plugins/square/Square.java" target-dir="src/com/intertad/phonegap/plugins/square"/>
 
+          <config-file target="AndroidManifest.xml" parent="/*">
+              <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+          </config-file>
         <config-file target="AndroidManifest.xml" parent="/*/application/activity">
           <intent-filter>
             <action android:name="android.intent.action.VIEW" />
