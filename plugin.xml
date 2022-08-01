@@ -83,7 +83,9 @@
         <source-file src="src/android/com/intertad/phonegap/plugins/square/Square.java" target-dir="src/com/intertad/phonegap/plugins/square"/>
 
           <config-file target="AndroidManifest.xml" parent="/*">
-              <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+              <queries>
+                  <package android:name="com.squareup" />
+              </queries>
           </config-file>
         <config-file target="AndroidManifest.xml" parent="/*/application/activity">
           <intent-filter>
