@@ -20,7 +20,7 @@
 #import "CDVSquareCardPayments.h"
 #import "NSURL+SCAdditions.h"
 #import "NSDictionary+SCAdditions.h"
-#import "JSONKit.h"
+#import "NSJSONSerialization.m"
 
 #import <Cordova/CDVAvailability.h>
 
