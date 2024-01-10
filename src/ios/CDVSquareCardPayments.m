@@ -52,12 +52,17 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
 - (void)checkInstalled:(CDVInvokedUrlCommand*)command
 {
     UIApplication *application = [UIApplication sharedApplication];
+
     NSURL *squareUrl = [NSURL URLWithString:CDVSquarePaymentUrl];
-    BOOL installed = [application canOpenURL:squareUrl];
 
-    NSDictionary *dict = @{CDVSquareCheckInstallResponseInstalledKey: @(installed)};
+    bool installed = [application canOpenURL:squareUrl];
 
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dict];
+    NSDictionary *dict = [NSDictionary dictionaryWithObject:@(installed)
+      forKey:CDVSquareCheckInstallResponseInstalledKey];
+
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                  messageAsDictionary:dict];
+
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
