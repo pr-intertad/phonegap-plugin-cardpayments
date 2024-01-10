@@ -23,6 +23,10 @@
 
 #import <Cordova/CDVAvailability.h>
 
+#ifndef __CORDOVA_3_2_0
+#warning "The keyboard plugin is only supported in Cordova 3.2 or greater, it may not work properly in an older version. If you do use this plugin in an older version, make sure the HideKeyboardFormAccessoryBar and KeyboardShrinksView preference values are false."
+#endif
+
 // urls
 NSString *const CDVSquarePaymentUrl = @"square-commerce-v1://payment/create";
 NSString *const CDVSquareCallbackUrl = @"auto-shop://square-complete";
@@ -33,6 +37,8 @@ NSString *const CDVSquarePaymentRequestClientIDKey = @"clientId";
 NSString *const CDVSquarePaymentRequestUserInfoStringKey = @"userInfo";
 NSString *const CDVSquarePaymentRequestAmountKey = @"amount";
 NSString *const CDVSquarePaymentRequestCurrencyKey = @"currency";
+//NSString *const CDVSquarePaymentRequestVersionKey = @"version";
+//NSString *const CDVSquarePaymentRequestMerchantIDKey = @"merchantId";
 
 // response fields
 NSString *const CDVSquarePaymentResponsePaymentIdKey = @"paymentId";
@@ -73,31 +79,36 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
 
     NSDictionary* params = [command.arguments objectAtIndex:0];
 
-    NSString *clientId = [params objectForKey: CDVSquarePaymentRequestClientIDKey];
-    NSString *userInfo = [params objectForKey: CDVSquarePaymentRequestUserInfoStringKey];
-    NSNumber *amount = [params objectForKey: CDVSquarePaymentRequestAmountKey];
-    NSString *currency = [params objectForKey: CDVSquarePaymentRequestCurrencyKey];
+    NSString *clientId      = [params objectForKey: CDVSquarePaymentRequestClientIDKey];
+    NSString *userInfo      = [params objectForKey: CDVSquarePaymentRequestUserInfoStringKey];
+    NSNumber *amount        = [params objectForKey: CDVSquarePaymentRequestAmountKey];
+    NSString *currency      = [params objectForKey: CDVSquarePaymentRequestCurrencyKey];
+  //NSString *merchantId    = [params objectForKey: CDVSquarePaymentRequestMerchantIDKey];
 
-    [self doSquarePaymentForClientId:clientId
-                            userInfo:userInfo
-                            currency:currency
-                              amount:amount
-                               error:&error];
+    [self doSquarePaymentForClientId: clientId
+                            userInfo: userInfo
+                            currency: currency
+                              amount: amount
+                               error: &error];
+ // merchantId: merchantId
+
+    //:(NSError *__autoreleasing *)error;
 
     if (error != nil) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[error userInfo]];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                     messageAsDictionary:[error userInfo]];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     }
 
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
-
-- (void)doSquarePaymentForClientId:(NSString *)clientId
-                          userInfo:(NSString *)userInfo
-                          currency:(NSString *)currency
-                            amount:(NSNumber *)amount
-                             error:(NSError *__autoreleasing *)error {
+ //merchantId: (NSString *) merchantId
+- (void)doSquarePaymentForClientId: (NSString *) clientId
+                          userInfo: (NSString *) userInfo
+                          currency: (NSString *) currency
+                            amount: (NSNumber *) amount
+                             error: (NSError *__autoreleasing *) error {
 
     NSMutableDictionary *amountMoney = [NSMutableDictionary dictionary];
     NSMutableDictionary *options = [NSMutableDictionary dictionary];
@@ -110,25 +121,21 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
     [parameters setObject:CDVSquareCallbackUrl forKey:@"callback_url"];
     [parameters setObject:clientId forKey:@"client_id"];
     [parameters setObject:userInfo forKey:@"notes"];
+    //[parameters setObject:merchantId forKey:@"merchant_id"];
 
     NSString *version = @"1.2";
     [parameters setObject:version forKey:@"version"];
 
+    //NSMutableArray *tender_types = [NSMutableArray arrayWithObjects:@"CREDIT_CARD", @"CASH", nil];
+    //NSMutableArray *tender_types = [NSMutableArray arrayWithObject:@"CREDIT_CARD"];
     NSArray *tender_types = @[@"CREDIT_CARD", @"CASH", @"OTHER", @"SQUARE_GIFT_CARD", @"CARD_ON_FILE"];
+
+    //NSArray *tender_types = @[@"CREDIT_CARD"];
+
     [options setValue:tender_types forKey:@"supported_tender_types"];
     [parameters setObject:options forKey:@"options"];
 
-    NSError *jsonError = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&jsonError];
-
-    if (jsonError) {
-        NSLog(@"Error creating JSON data: %@", jsonError);
-        *error = [NSError errorWithDomain:CDVSquarePaymentErrorDomain
-                                     code:1
-                                 userInfo:@{ @"message": @"Error creating JSON data" }];
-        return;
-    }
-
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];
     NSString *jsonParameters = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 
     NSString *squareUrlString = [NSString stringWithFormat:@"%@?data=%@", CDVSquarePaymentUrl, [jsonParameters SC_URLEncodeUsingEncoding:NSUTF8StringEncoding]];
@@ -140,12 +147,14 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
         [application openURL:squareUrl];
     } else {
         *error = [NSError errorWithDomain: CDVSquarePaymentErrorDomain
-                                     code: 2
-                                 userInfo: @{ @"message": @"Square app is not installed" }];
+                                     code: 1
+                                 userInfo: [NSDictionary dictionaryWithObject: @"Square app is not installed"
+                                                                       forKey: @"message"]];
     }
+
 }
 
-- (void)handleCallback:(CDVInvokedUrlCommand*)command
+- (void) handleCallback:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult = nil;
     NSURL *url = [NSURL URLWithString:[command.arguments objectAtIndex:0]];
@@ -159,27 +168,27 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
         NSDictionary *data = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&jsonError];
 
         if (jsonError) {
+            // Handle the error if needed
             NSLog(@"Error parsing JSON: %@", jsonError);
-            pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:@"Error parsing JSON"];
-        } else {
-            NSString *status = [data SC_stringForKey:@"status"];
-            [dict setValue:status forKey:CDVSquarePaymentResponseStatusKey];
-            [dict setValue:[data SC_stringForKey:@"state"] forKey:CDVSquarePaymentResponseUserInfoStringKey];
-
-            if ([status isEqualToString:@"ok"]) {
-                [dict setValue:[data SC_stringForKey:@"payment_id"] forKey:CDVSquarePaymentResponsePaymentIdKey];
-                [dict setValue:[data SC_stringForKey:@"offline_payment_id"] forKey:CDVSquarePaymentResponseOfflinePaymentIdKey];
-
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dict];
-            } else {
-                [dict setValue:[data SC_stringForKey:@"error_code"] forKey:CDVSquarePaymentErrorCodeKey];
-                [dict setValue:CDVSquarePaymentErrorDomain forKey:CDVSquarePaymentErrorDomainKey];
-
-                pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsDictionary: dict];
-            }
         }
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:@"No data provided"];
+
+        NSString *status = [data SC_stringForKey:@"status"];
+
+        [dict setValue:status forKey:CDVSquarePaymentResponseStatusKey];
+        [dict setValue:[data SC_stringForKey:@"state"] forKey:CDVSquarePaymentResponseUserInfoStringKey];
+
+
+        if ([status isEqualToString:@"ok"]) {
+            [dict setValue:[data SC_stringForKey:@"payment_id"] forKey:CDVSquarePaymentResponsePaymentIdKey];
+            [dict setValue:[data SC_stringForKey:@"offline_payment_id"] forKey:CDVSquarePaymentResponseOfflinePaymentIdKey];
+
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dict];
+        } else {
+            [dict setValue:[data SC_stringForKey:@"error_code"] forKey:CDVSquarePaymentErrorCodeKey];
+            [dict setValue:CDVSquarePaymentErrorDomain forKey:CDVSquarePaymentErrorDomainKey];
+
+            pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsDictionary: dict];
+        }
     }
     
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
