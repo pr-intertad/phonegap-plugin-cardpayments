@@ -128,7 +128,10 @@ public class Square extends CordovaPlugin {
                     // Persist and use the transaction IDs however you choose
                     requestCallback.success(parameter);
                 } else {
+                    // TODO - here I can check errors
                     ChargeRequest.Error error = registerClient.parseChargeError(data);
+
+                    System.out.println("Error" + error.code.toString());
 
                     // Get the type of error that occurred
                     parameter.putOpt("errorCode", error.code.toString());
