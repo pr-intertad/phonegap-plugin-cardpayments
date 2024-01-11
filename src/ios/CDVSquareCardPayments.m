@@ -20,7 +20,6 @@
 #import "CDVSquareCardPayments.h"
 #import "NSURL+SCAdditions.h"
 #import "NSDictionary+SCAdditions.h"
-#import "JSONKit.h"
 
 #import <Cordova/CDVAvailability.h>
 
@@ -114,7 +113,7 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
     NSMutableDictionary *amountMoney = [NSMutableDictionary dictionary];
     NSMutableDictionary *options = [NSMutableDictionary dictionary];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
-    
+
     [amountMoney setObject:amount forKey:@"amount"];
     [amountMoney setObject:currency forKey:@"currency_code"];
     
@@ -136,12 +135,10 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
     [options setValue:tender_types forKey:@"supported_tender_types"];
     [parameters setObject:options forKey:@"options"];
     
-    NSString *jsonParameters = [parameters JSONString];
-    
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];
+    NSString *jsonParameters = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     NSString *squareUrlString = [NSString stringWithFormat:@"%@?data=%@", CDVSquarePaymentUrl, [jsonParameters SC_URLEncodeUsingEncoding:NSUTF8StringEncoding]];
-    
     NSURL *squareUrl = [NSURL URLWithString:squareUrlString];
-    
     UIApplication *application = [UIApplication sharedApplication];
     if ([application canOpenURL:squareUrl]){
         [application openURL:squareUrl];
@@ -161,9 +158,16 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
     NSDictionary *urlParameters = [url SC_parameters];
     NSString *dataString = [urlParameters SC_stringForKey: CDVSquarePaymentRequestUrlDataKey];
     NSDictionary *dict = [NSMutableDictionary dictionary];
-    
+
     if (dataString != nil) {
-        NSDictionary *data = [dataString objectFromJSONString];
+       NSData *jsonData = [dataString dataUsingEncoding:NSUTF8StringEncoding];
+       NSError *jsonError = nil;
+       NSDictionary *data = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&jsonError];
+
+       if (jsonError) {
+           // Handle the error if needed
+           NSLog(@"Error parsing JSON: %@", jsonError);
+       }
         
         NSString *status = [data SC_stringForKey:@"status"];
         

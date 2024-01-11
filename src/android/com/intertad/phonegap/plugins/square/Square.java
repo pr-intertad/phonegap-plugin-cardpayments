@@ -129,7 +129,6 @@ public class Square extends CordovaPlugin {
                     requestCallback.success(parameter);
                 } else {
                     ChargeRequest.Error error = registerClient.parseChargeError(data);
-
                     // Get the type of error that occurred
                     parameter.putOpt("errorCode", error.code.toString());
 
