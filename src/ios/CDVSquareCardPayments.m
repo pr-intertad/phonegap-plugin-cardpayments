@@ -84,11 +84,6 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
     NSNumber *amount        = [params objectForKey: CDVSquarePaymentRequestAmountKey];
     NSString *currency      = [params objectForKey: CDVSquarePaymentRequestCurrencyKey];
   //NSString *merchantId    = [params objectForKey: CDVSquarePaymentRequestMerchantIDKey];
-
-    NSLog(@"Log CLIENT ID: %@", clientId);
-    NSLog(@"Log USER INFO: %@", userInfo);
-    NSLog(@"Log AMOUNT: %@", amount);
-    NSLog(@"Log CURRENCY: %@", currency);
     
     [self doSquarePaymentForClientId: clientId
                             userInfo: userInfo
@@ -100,11 +95,9 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
     //:(NSError *__autoreleasing *)error;
     
     if (error != nil) {
-        NSLog(@"Log ERROR INSIDE CREATEPAYMENT: %@", error);
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
                                      messageAsDictionary:[error userInfo]];
     } else {
-        NSLog(@"Log ERROR ELSE INSIDE CREATEPAYMENT: %@", error);
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     }
     
@@ -121,10 +114,6 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
     NSMutableDictionary *options = [NSMutableDictionary dictionary];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
 
-    NSLog(@"Log AMOUNT MONEY: %@", amountMoney);
-    NSLog(@"Log OPTIONS: %@", options);
-    NSLog(@"Log PARAMETERS: %@", parameters);
-    
     [amountMoney setObject:amount forKey:@"amount"];
     [amountMoney setObject:currency forKey:@"currency_code"];
     
@@ -148,18 +137,8 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
     
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];
     NSString *jsonParameters = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-
-    NSLog(@"Log JSON DATA: %@", jsonData);
-    NSLog(@"Log JSON PARAMETERS: %@", jsonParameters);
-
     NSString *squareUrlString = [NSString stringWithFormat:@"%@?data=%@", CDVSquarePaymentUrl, [jsonParameters SC_URLEncodeUsingEncoding:NSUTF8StringEncoding]];
-
-    NSLog(@"Log SQUARE URL STRING: %@", squareUrlString);
-    
     NSURL *squareUrl = [NSURL URLWithString:squareUrlString];
-
-    NSLog(@"Log SQUARE URL: %@", squareUrl);
-    
     UIApplication *application = [UIApplication sharedApplication];
     if ([application canOpenURL:squareUrl]){
         [application openURL:squareUrl];
@@ -180,18 +159,10 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
     NSString *dataString = [urlParameters SC_stringForKey: CDVSquarePaymentRequestUrlDataKey];
     NSDictionary *dict = [NSMutableDictionary dictionary];
 
-    NSLog(@"Message DATA STRING: %@", dataString);
-    NSLog(@"Message pluginResult HANDLE CALLBACK: %@", pluginResult);
-    NSLog(@"Message url HANDLE CALLBACK: %@", url);
-    NSLog(@"Message urlParameters HANDLE CALLBACK: %@", urlParameters);
-    NSLog(@"Message dict HANDLE CALLBACK: %@", dict);
-
     if (dataString != nil) {
        NSData *jsonData = [dataString dataUsingEncoding:NSUTF8StringEncoding];
        NSError *jsonError = nil;
        NSDictionary *data = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&jsonError];
-
-       NSLog(@"Message DATA FOR HANGLE: %@", data);
 
        if (jsonError) {
            // Handle the error if needed
