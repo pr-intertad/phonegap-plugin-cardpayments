@@ -49,8 +49,6 @@
 
         </config-file>
 
-        <header-file src="src/ios/JSONKit.h" />
-        <source-file src="src/ios/JSONKit.m" compiler-flags="-fno-objc-arc" />
         <header-file src="src/ios/NSDictionary+SCAdditions.h" />
         <source-file src="src/ios/NSDictionary+SCAdditions.m" />
         <header-file src="src/ios/NSURL+SCAdditions.h" />
