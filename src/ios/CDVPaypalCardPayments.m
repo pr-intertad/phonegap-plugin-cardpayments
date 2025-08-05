@@ -112,7 +112,7 @@ NSString *const CDVPaypalPaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
         
     UIApplication *application = [UIApplication sharedApplication];
     if ([application canOpenURL:pphUrl]){
-        [application openURL:pphUrl];
+        [application openURL:pphUrl options:@{} completionHandler:nil];
     } else {
         *error = [NSError errorWithDomain: CDVPaypalPaymentErrorDomain
                                      code: 1
