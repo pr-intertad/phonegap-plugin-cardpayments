@@ -142,7 +142,7 @@ NSString *const CDVSquarePaymentErrorDomain = @"com.intertad.phonegap.plugins.ca
     NSURL *squareUrl = [NSURL URLWithString:squareUrlString];
     UIApplication *application = [UIApplication sharedApplication];
     if ([application canOpenURL:squareUrl]){
-        [application openURL:squareUrl];
+        [application openURL:squareUrl options:@{} completionHandler:nil];
     } else {
         *error = [NSError errorWithDomain: CDVSquarePaymentErrorDomain
                                      code: 1
